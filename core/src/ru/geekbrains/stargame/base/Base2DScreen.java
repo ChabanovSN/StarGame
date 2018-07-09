@@ -50,6 +50,10 @@ public class Base2DScreen implements Screen, InputProcessor {
 
     }
 
+    public Rect getWorldBounds() {
+        return worldBounds;
+    }
+
     @Override
     public void resize(int width, int height) {
         screenBounds.setSize(width, height);
