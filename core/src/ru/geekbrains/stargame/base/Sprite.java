@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.math.Rect;
+import ru.geekbrains.stargame.utils.Regions;
 
 /**
  * Спрайт
@@ -24,6 +25,13 @@ public class Sprite extends Rect {
         }
         regions = new TextureRegion[1];
         regions[0] = region;
+    }
+
+    public Sprite(TextureRegion region, int rows, int cols, int frames) {
+        if (region == null) {
+            throw new NullPointerException();
+        }
+        regions = Regions.split(region, rows, cols, frames);
     }
 
     public void draw(SpriteBatch batch) {

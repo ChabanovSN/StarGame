@@ -70,6 +70,7 @@ public class Base2DScreen implements Screen, InputProcessor {
     }
 
     public void resize(Rect worldBounds) {
+
         System.out.println("resize w=" + worldBounds.getWidth() + " h=" + worldBounds.getHeight());
     }
 
@@ -156,4 +157,6 @@ public class Base2DScreen implements Screen, InputProcessor {
         System.out.println("scrolled amount=" + amount);
         return false;
     }
+
+
 }

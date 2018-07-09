@@ -35,6 +35,7 @@ public class Star extends Sprite {
     public void update(float delta) {
         pos.mulAdd(v, delta);
         checkAndHandleBounds();
+        scale =Rnd.nextFloat(0.7f,1.5f); // эффект мерцания
     }
 
     private void checkAndHandleBounds() {

@@ -12,7 +12,7 @@ public class BaseEnemyShip extends Sprite {
     private Vector2 v0 = new Vector2(0.0f, -0.05f);
     private Rect worldBounds;
     private float xPos;
-    private boolean gone=false;// проверка прохождения экрана
+    private boolean gone=false;// РїСЂРѕРІРµСЂРєР° РїСЂРѕС…РѕР¶РґРµРЅРёСЏ СЌРєСЂР°РЅР°
     public BaseEnemyShip(TextureRegion region, int rows, int cols, int frames) {
         super(region, rows, cols, frames);
         setHeightProportion(SHIP_HEIGHT);
@@ -29,7 +29,7 @@ public class BaseEnemyShip extends Sprite {
          }
 
     public void setxPos(float xPos) {
-        this.xPos = xPos; // охота на главный корабль
+        this.xPos = xPos; // РѕС…РѕС‚Р° РЅР° РіР»Р°РІРЅС‹Р№ РєРѕСЂР°Р±Р»СЊ
     }
 
     public boolean isGone() {
@@ -65,12 +65,12 @@ public class BaseEnemyShip extends Sprite {
     }
     private void fall(){
         v0.x=xPos;
-        v0.y -=0.01f; /// ускорение книзу
+        v0.y -=0.01f; /// СѓСЃРєРѕСЂРµРЅРёРµ РєРЅРёР·Сѓ
           v.set(v0);
     }
 
     public void newShip(){
-        gone = true; // проверка прохождения экрана
+        gone = true; // РїСЂРѕРІРµСЂРєР° РїСЂРѕС…РѕР¶РґРµРЅРёСЏ СЌРєСЂР°РЅР°
         v0 = new Vector2(0.0f, -0.3f);
         v = new Vector2(Rnd.nextFloat(-0.4f, 0.4f), 0.6f);
 

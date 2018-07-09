@@ -15,9 +15,9 @@ public class MainShip extends Sprite {
 
     private Vector2 v = new Vector2();
     private Vector2 v0 = new Vector2(0.5f, 0f);
-
     private boolean pressedLeft;
     private boolean pressedRight;
+    private int pointer;
 
     private Rect worldBounds;
 
@@ -34,13 +34,14 @@ public class MainShip extends Sprite {
 
     @Override
     public void update(float delta) {
-        pos.mulAdd(v, delta);
+         pos.mulAdd(v, delta);
         checkAndHandleBounds();
     }
 
     private void checkAndHandleBounds() {
-        if (getRight() < worldBounds.getLeft()) setLeft(worldBounds.getRight());
-        if (getLeft() > worldBounds.getRight()) setRight(worldBounds.getLeft());
+        if (getRight() > worldBounds.getRight()) setRight(worldBounds.getRight());
+        if (getLeft() < worldBounds.getLeft()) setLeft(worldBounds.getLeft());
+
     }
 
     public void keyDown(int keycode) {
@@ -79,6 +80,28 @@ public class MainShip extends Sprite {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void touchDown(Vector2 touch, int pointer) {
+        this.pointer = pointer;
+        touch.y = 0;
+        if (touch.x < 0) {
+            if (touch.x < getLeft()) {
+                moveLeft();
+            } else moveRight();
+
+        } else if (touch.x > 0) {
+            if (touch.x > getRight()) {
+                moveRight();
+            } else moveLeft();
+
+        } else stop();
+    }
+
+    @Override
+    public void touchUp(Vector2 touch, int pointer) {
+        if(this.pointer == pointer) stop();
     }
 
     private void moveLeft() {
