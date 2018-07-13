@@ -9,16 +9,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.base.Base2DScreen;
-import ru.geekbrains.stargame.base.BaseEnemyShip;
+import ru.geekbrains.stargame.base.Ship;
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.math.Rnd;
+import ru.geekbrains.stargame.pools.BulletPool;
+import ru.geekbrains.stargame.pools.EnemyPool;
 import ru.geekbrains.stargame.sprite.Background;
-import ru.geekbrains.stargame.sprite.BigShip;
 import ru.geekbrains.stargame.sprite.MainShip;
-import ru.geekbrains.stargame.sprite.MeddleShip;
-import ru.geekbrains.stargame.sprite.SmallShip;
 import ru.geekbrains.stargame.sprite.Star;
-
+import ru.geekbrains.stargame.utils.EnemiesEmitter;
 
 
 public class GameScreen extends Base2DScreen {
@@ -32,20 +31,28 @@ public class GameScreen extends Base2DScreen {
     private TextureAtlas atlas;
 
     private MainShip mainShip;
-    private  BaseEnemyShip enemyShipOne;
-    private BaseEnemyShip enemyShip[]= new BaseEnemyShip[3];
+    private Ship enemyShipOne;
+    private Ship enemyShip[]= new Ship[3];
 
 
     private float generateInterval = 4f;
     private float generateTimer;
 
+    private BulletPool bulletPool;
+    private EnemyPool enemyPool;
+
+    private EnemiesEmitter enemiesEmitter;
+    Star tail;
+
     public GameScreen(Game game) {
         super(game);
+
     }
 
     @Override
     public void show() {
         super.show();
+
         bg = new Texture("textures/bg.png");
         background = new Background(new TextureRegion(bg));
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
@@ -54,17 +61,14 @@ public class GameScreen extends Base2DScreen {
         for (int i = 0; i < star.length; i++) {
             star[i] = new Star(starRegion, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), Rnd.nextFloat(0.005f,0.013f));
         }
-        mainShip = new MainShip(atlas);
 
-        enemyShip[0] = new BigShip(atlas);
-        enemyShip[1] = new MeddleShip(atlas);
-        enemyShip[2] = new SmallShip(atlas);
 
-        for (int i = 0; i <enemyShip.length ; i++) {
-            enemyShip[i].setWorldBounds(super.getWorldBounds()); /// это что бы получить границы мира без resize()
-        }
+        bulletPool = new BulletPool();
+        mainShip = new MainShip(atlas, bulletPool);
+        tail = new Star(starRegion,mainShip.pos.x,mainShip.pos.y,0.09f); /// tail of the mainShip
+        enemyPool = new EnemyPool(bulletPool, worldBounds);
+        this.enemiesEmitter = new EnemiesEmitter(worldBounds, enemyPool, atlas);
     }
-
     @Override
     public void render(float delta) {
         super.render(delta);
@@ -75,52 +79,28 @@ public class GameScreen extends Base2DScreen {
     }
 
     public void update(float delta) {
-        for (Star s : star) s.update(delta);
+        for (int i = 0; i < star.length; i++) {
+            star[i].update(delta);
+        }
         mainShip.update(delta);
-        generateTimer += delta;
-        if (generateInterval <= generateTimer) {
-            generateTimer = 0f;
-            if (enemyShipOne == null)
-                enemyShipOne = enemyShip[(int) Rnd.nextFloat(0, 3)];
-            else if (enemyShipOne.isGone())
-                enemyShipOne = enemyShip[(int) Rnd.nextFloat(0, 3)];
-        }
-
-        if (enemyShipOne != null) {
-            if (!enemyShipOne.isGone()) {
-                enemyShipOne.setxPos(mainShip.pos.x); // охота на главный корабль
-                enemyShipOne.update(delta);
-            }
-        }
-
-        checkArrayShip(); /// обнуление кораблей
-
-
-    }
-
-    private void checkArrayShip() {
-        int checkCount=0;
-        for(BaseEnemyShip ship :enemyShip){
-            if(ship.isGone())checkCount++;
-        }
-        if(checkCount==3){
-            for(BaseEnemyShip ship :enemyShip){
-               ship.setGone(false);
-            }
-        }
+        tail.update(mainShip);
+        bulletPool.updateActiveSprites(delta);
+        enemyPool.updateActiveSprites(delta);
+        enemiesEmitter.generateEnemies(delta);
     }
 
     public void draw() {
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-
         background.draw(batch);
-        for (Star s : star) s.draw(batch);
-        mainShip.draw(batch);
-        if (enemyShipOne != null) {
-            if (!enemyShipOne.isGone()) enemyShipOne.draw(batch);
+        for (int i = 0; i < star.length; i++) {
+            star[i].draw(batch);
         }
+        mainShip.draw(batch);
+        tail.draw(batch);
+        bulletPool.drawActiveSprites(batch);
+        enemyPool.drawActiveSprites(batch);
         batch.end();
     }
 
@@ -129,7 +109,8 @@ public class GameScreen extends Base2DScreen {
     }
 
     public void deleteAllDestroyed() {
-
+        bulletPool.freeAllDestroyedActiveSprites();
+        enemyPool.freeAllDestroyedActiveSprites();
     }
 
     @Override
@@ -140,14 +121,15 @@ public class GameScreen extends Base2DScreen {
             star[i].resize(worldBounds);
         }
         mainShip.resize(worldBounds);
-        if (enemyShipOne != null) enemyShipOne.resize(worldBounds);
-
+        tail.resize(worldBounds);
     }
 
     @Override
     public void dispose() {
         bg.dispose();
         atlas.dispose();
+        bulletPool.dispose();
+        enemyPool.dispose();
         super.dispose();
     }
 
@@ -173,6 +155,8 @@ public class GameScreen extends Base2DScreen {
               mainShip.touchUp(touch,pointer);
 
     }
+    private void mainShipTail(){
 
+    }
 
 }

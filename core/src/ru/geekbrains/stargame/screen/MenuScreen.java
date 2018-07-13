@@ -2,6 +2,7 @@ package ru.geekbrains.stargame.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -39,14 +40,17 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
     private ButtonExit buttonExit;
     private ButtonPlay buttonPlay;
 
-
+    private Music musicBk  = Gdx.audio.newMusic(Gdx.files.internal("sounds/bk.mp3"));
     public MenuScreen(Game game) {
         super(game);
+
+
     }
 
     @Override
     public void show() {
         super.show();
+        musicBk.play();
         bg = new Texture("textures/bg.png");
         background = new Background(new TextureRegion(bg));
         atlas = new TextureAtlas("textures/menuAtlas.tpack");
@@ -88,6 +92,7 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         bg.dispose();
         atlas.dispose();
         super.dispose();
+        musicBk.dispose();
     }
 
     @Override
@@ -124,5 +129,17 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         } else {
             throw new RuntimeException("Unknown src");
         }
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+        musicBk.pause();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+        musicBk.play();
     }
 }

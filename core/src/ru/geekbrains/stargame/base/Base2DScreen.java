@@ -21,13 +21,14 @@ public class Base2DScreen implements Screen, InputProcessor {
 
     protected Game game;
     private Rect screenBounds; // границы экрана в пикселях
-    private Rect worldBounds; // границы проэкции мировых координат
+    protected Rect worldBounds; // границы проэкции мировых координат
     private Rect glBounds; // gl-левские координаты
 
     protected Matrix4 worldToGl;
     protected Matrix3 screenToWorld;
 
     private Vector2 touch = new Vector2();
+
 
     public Base2DScreen(Game game) {
         this.game = game;
@@ -38,6 +39,7 @@ public class Base2DScreen implements Screen, InputProcessor {
         this.screenToWorld = new Matrix3();
         Gdx.input.setInputProcessor(this);
         batch = new SpriteBatch();
+
     }
 
     @Override

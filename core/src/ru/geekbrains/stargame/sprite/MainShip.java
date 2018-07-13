@@ -4,11 +4,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.geekbrains.stargame.base.Sprite;
+import ru.geekbrains.stargame.base.Ship;
+
 import ru.geekbrains.stargame.math.Rect;
+import ru.geekbrains.stargame.pools.BulletPool;
 
 
-public class MainShip extends Sprite {
+public class MainShip extends Ship {
 
     private static final float SHIP_HEIGHT = 0.15f;
     private static final float BOTTOM_MARGIN = 0.05f;
@@ -17,24 +19,36 @@ public class MainShip extends Sprite {
     private Vector2 v0 = new Vector2(0.5f, 0f);
     private boolean pressedLeft;
     private boolean pressedRight;
-    private int pointer;
+    private final int pointerDefault=-1;/// мультитач: работает только на один палец( нажатие) так больше похоже на джойстик
+    private int pointer = pointerDefault;///мультитач: при этом можно вообще только в одну точку нажимать и корабль будет ходить влево-вправо
 
-    private Rect worldBounds;
 
-    public MainShip(TextureAtlas atlas) {
-        super(atlas.findRegion("main_ship"), 1, 2,2 );
-        setHeightProportion(SHIP_HEIGHT);
-    }
+public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
+    super(atlas.findRegion("main_ship"), 1, 2,2 );
+    setHeightProportion(SHIP_HEIGHT);
+    this.bulletPool = bulletPool;
+    this.bulletRegion = atlas.findRegion("bulletMainShip");
+    this.bulletHeight = 0.01f;
+    this.bulletV.set(0, 0.5f);
+    this.bulletDamage = 1;
+    this.reloadInterval = 0.2f;
+}
 
     @Override
     public void resize(Rect worldBounds) {
+        super.resize(worldBounds);
         setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
-        this.worldBounds = worldBounds;
     }
 
     @Override
     public void update(float delta) {
-         pos.mulAdd(v, delta);
+        pos.mulAdd(v, delta);
+        reloadTimer += delta;
+        if (reloadTimer >= reloadInterval) {
+            reloadTimer = 0f;
+            shoot();
+
+        }
         checkAndHandleBounds();
     }
 
@@ -55,6 +69,9 @@ public class MainShip extends Sprite {
             case Input.Keys.RIGHT:
                 pressedRight = true;
                 moveRight();
+                break;
+            case Input.Keys.UP:
+                shoot();
                 break;
         }
     }
@@ -84,19 +101,25 @@ public class MainShip extends Sprite {
 
     @Override
     public void touchDown(Vector2 touch, int pointer) {
-        this.pointer = pointer;
-        touch.y = 0;
-        if (touch.x < 0) {
-            if (touch.x < getLeft()) {
-                moveLeft();
-            } else moveRight();
+        if (this.pointer == pointerDefault) {
+            this.pointer = pointer;
+            touch.y = 0;
+            if (touch.x < 0) {
+                if (touch.x < getLeft()) {
+                    moveLeft();
+                } else moveRight();
 
-        } else if (touch.x > 0) {
-            if (touch.x > getRight()) {
-                moveRight();
-            } else moveLeft();
+            } else if (touch.x > 0) {
+                if (touch.x > getRight()) {
+                    moveRight();
+                } else moveLeft();
 
-        } else stop();
+            } else {
+                stop();
+            }
+        } else {
+            return;
+        }
     }
 
     @Override
@@ -113,6 +136,7 @@ public class MainShip extends Sprite {
     }
 
     private void stop() {
+        this.pointer= pointerDefault;
         v.setZero();
     }
 }
