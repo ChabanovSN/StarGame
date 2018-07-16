@@ -38,6 +38,9 @@ public class Sprite extends Rect {
     }
 
     public void draw(SpriteBatch batch) {
+        if (isDestroyed) {
+            return;
+        }
         batch.draw(
                 regions[frame], // текущий регион
                 getLeft(), getBottom(), // точка отрисовки
@@ -50,7 +53,9 @@ public class Sprite extends Rect {
 
     public void setHeightProportion(float height) {
         setHeight(height);
-        float aspect = regions[frame].getRegionWidth() / (float) regions[frame].getRegionHeight();
+
+            float aspect = regions[frame].getRegionWidth() / (float) regions[frame].getRegionHeight();
+
         setWidth(height * aspect);
     }
 

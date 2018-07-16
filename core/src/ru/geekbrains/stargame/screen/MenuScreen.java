@@ -40,7 +40,7 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
     private ButtonExit buttonExit;
     private ButtonPlay buttonPlay;
 
-    private Music musicBk  = Gdx.audio.newMusic(Gdx.files.internal("sounds/bk.mp3"));
+
     public MenuScreen(Game game) {
         super(game);
 
@@ -50,7 +50,7 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
     @Override
     public void show() {
         super.show();
-        musicBk.play();
+
         bg = new Texture("textures/bg.png");
         background = new Background(new TextureRegion(bg));
         atlas = new TextureAtlas("textures/menuAtlas.tpack");
@@ -92,7 +92,7 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
         bg.dispose();
         atlas.dispose();
         super.dispose();
-        musicBk.dispose();
+
     }
 
     @Override
@@ -134,12 +134,12 @@ public class MenuScreen extends Base2DScreen implements ActionListener {
     @Override
     public void pause() {
         super.pause();
-        musicBk.pause();
+
     }
 
     @Override
     public void resume() {
         super.resume();
-        musicBk.play();
+
     }
 }

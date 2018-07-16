@@ -1,6 +1,7 @@
 package ru.geekbrains.stargame.sprite;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
@@ -8,6 +9,7 @@ import ru.geekbrains.stargame.base.Ship;
 
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.pools.BulletPool;
+import ru.geekbrains.stargame.pools.ExplosionPool;
 
 
 public class MainShip extends Ship {
@@ -23,8 +25,8 @@ public class MainShip extends Ship {
     private int pointer = pointerDefault;///мультитач: при этом можно вообще только в одну точку нажимать и корабль будет ходить влево-вправо
 
 
-public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
-    super(atlas.findRegion("main_ship"), 1, 2,2 );
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound sound) {
+        super(atlas.findRegion("main_ship"), 1, 2, 2, sound );
     setHeightProportion(SHIP_HEIGHT);
     this.bulletPool = bulletPool;
     this.bulletRegion = atlas.findRegion("bulletMainShip");
@@ -32,6 +34,8 @@ public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
     this.bulletV.set(0, 0.5f);
     this.bulletDamage = 1;
     this.reloadInterval = 0.2f;
+    this.explosionPool = explosionPool;
+    this.hp = 6;
 }
 
     @Override
@@ -49,6 +53,7 @@ public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
             shoot();
 
         }
+
         checkAndHandleBounds();
     }
 
@@ -138,5 +143,11 @@ public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
     private void stop() {
         this.pointer= pointerDefault;
         v.setZero();
+    }
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > pos.y
+                || bullet.getTop() < getBottom());
     }
 }
