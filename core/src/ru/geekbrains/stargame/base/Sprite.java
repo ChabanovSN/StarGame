@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.stargame.math.Rect;
+import ru.geekbrains.stargame.sprite.Star;
 import ru.geekbrains.stargame.utils.Regions;
 
 /**
@@ -18,6 +19,7 @@ public class Sprite extends Rect {
     protected TextureRegion[] regions;
     protected int frame;
     private boolean isDestroyed;
+
 
     public Sprite() {
 

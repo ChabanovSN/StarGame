@@ -16,28 +16,45 @@ public class MainShip extends Ship {
 
     private static final float SHIP_HEIGHT = 0.15f;
     private static final float BOTTOM_MARGIN = 0.05f;
-
+    private static final int INVALID_POINTER = -1;
     private Vector2 v = new Vector2();
     private Vector2 v0 = new Vector2(0.5f, 0f);
     private boolean pressedLeft;
     private boolean pressedRight;
-    private final int pointerDefault=-1;/// мультитач: работает только на один палец( нажатие) так больше похоже на джойстик
-    private int pointer = pointerDefault;///мультитач: при этом можно вообще только в одну точку нажимать и корабль будет ходить влево-вправо
+
+    private int bulletDamageDefault =1;
+    private float bulletHeightDefault = 0.01f;
+    private int bulletDamageBonus = bulletDamageDefault;
+     private Vector2 bulletVDefault = new Vector2(0,0.5f);
+    private Vector2 bulletVBonus = bulletVDefault;
+    private float bonusTime;
+    private float bonusTimeStep=0;
+    private int leftPointer = INVALID_POINTER;
+    private int rightPointer = INVALID_POINTER;
 
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound sound) {
-        super(atlas.findRegion("main_ship"), 1, 2, 2, sound );
+    public MainShip(TextureAtlas atlas, Rect worldBounds, BulletPool bulletPool, ExplosionPool explosionPool, Sound sound) {
+        super(atlas.findRegion("main_ship"), 1, 2, 2, sound, worldBounds );
     setHeightProportion(SHIP_HEIGHT);
     this.bulletPool = bulletPool;
     this.bulletRegion = atlas.findRegion("bulletMainShip");
-    this.bulletHeight = 0.01f;
-    this.bulletV.set(0, 0.5f);
-    this.bulletDamage = 1;
-    this.reloadInterval = 0.2f;
     this.explosionPool = explosionPool;
-    this.hp = 6;
-}
+    this.worldBounds = worldBounds;
+    setToNewGame();
 
+}
+    public void setToNewGame() {
+        pos.x = worldBounds.pos.x;
+        this.bulletHeight = bulletHeightDefault;
+        this.bulletV.set(bulletVDefault);
+        this.bulletDamage = bulletDamageDefault;
+        this.reloadInterval = 0.2f;
+        this.hp = 100;
+        this.bonusTime=0;
+        this.bonusTimeStep=0;
+
+        flushDestroy();
+    }
     @Override
     public void resize(Rect worldBounds) {
         super.resize(worldBounds);
@@ -46,11 +63,26 @@ public class MainShip extends Ship {
 
     @Override
     public void update(float delta) {
+        super.update(delta);
         pos.mulAdd(v, delta);
         reloadTimer += delta;
+        this.posYtail=getBottom();
         if (reloadTimer >= reloadInterval) {
             reloadTimer = 0f;
-            shoot();
+
+            if(bulletDamageBonus !=bulletDamageDefault){
+                bonusTimeStep +=delta;
+                shoot(bulletDamageBonus, bulletVBonus );
+                if(bonusTimeStep>bonusTime){
+                    bulletDamageBonus =bulletDamageDefault;
+                    bulletVBonus=bulletVDefault;
+                    bonusTimeStep=0;
+                    bonusTime=0;
+                    reloadInterval= 0.2f;
+                }
+            }
+
+            else shoot();
 
         }
 
@@ -106,31 +138,41 @@ public class MainShip extends Ship {
 
     @Override
     public void touchDown(Vector2 touch, int pointer) {
-        if (this.pointer == pointerDefault) {
-            this.pointer = pointer;
-            touch.y = 0;
-            if (touch.x < 0) {
-                if (touch.x < getLeft()) {
-                    moveLeft();
-                } else moveRight();
-
-            } else if (touch.x > 0) {
-                if (touch.x > getRight()) {
-                    moveRight();
-                } else moveLeft();
-
-            } else {
-                stop();
+        if (touch.x < worldBounds.pos.x) {
+            if (leftPointer != INVALID_POINTER) {
+                return;
             }
+            leftPointer = pointer;
+            moveLeft();
         } else {
-            return;
+            if (rightPointer != INVALID_POINTER) {
+                return;
+            }
+            rightPointer = pointer;
+            moveRight();
         }
     }
 
     @Override
     public void touchUp(Vector2 touch, int pointer) {
-        if(this.pointer == pointer) stop();
+        if (pointer == leftPointer) {
+            leftPointer = INVALID_POINTER;
+            if (rightPointer != INVALID_POINTER) {
+                moveRight();
+            } else {
+                stop();
+            }
+        } else if (pointer == rightPointer) {
+            rightPointer = INVALID_POINTER;
+            if (leftPointer != INVALID_POINTER) {
+                moveLeft();
+            } else {
+                stop();
+            }
+        }
+        stop();
     }
+
 
     private void moveLeft() {
         v.set(v0).rotate(180);
@@ -141,7 +183,7 @@ public class MainShip extends Ship {
     }
 
     private void stop() {
-        this.pointer= pointerDefault;
+
         v.setZero();
     }
     public boolean isBulletCollision(Rect bullet) {
@@ -150,4 +192,15 @@ public class MainShip extends Ship {
                 || bullet.getBottom() > pos.y
                 || bullet.getTop() < getBottom());
     }
+
+
+
+    public void setBonus(Vector2 bulletVBonus, int bulletDamageBonus,float bonusTime) {
+        this.bulletVBonus = bulletVBonus;
+        this.bulletDamageBonus += bulletDamageBonus;
+        this.bonusTime += bonusTime;
+        reloadInterval -= 0.02f;
+    }
+
+
 }

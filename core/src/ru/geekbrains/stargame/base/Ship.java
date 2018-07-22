@@ -1,6 +1,6 @@
 package ru.geekbrains.stargame.base;
 
-import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -11,7 +11,7 @@ import ru.geekbrains.stargame.pools.BulletPool;
 import ru.geekbrains.stargame.pools.ExplosionPool;
 import ru.geekbrains.stargame.sprite.Bullet;
 import ru.geekbrains.stargame.sprite.Explosion;
-import ru.geekbrains.stargame.sprite.Star;
+
 
 public class Ship extends Sprite {
 
@@ -31,7 +31,7 @@ public class Ship extends Sprite {
 
     protected float reloadInterval;
     protected float reloadTimer;
-
+    protected float posYtail;
 
     protected int hp;
 
@@ -47,7 +47,7 @@ public class Ship extends Sprite {
     }
 
 
-    public Ship(TextureRegion region, int rows, int cols, int frames, Sound sound) {
+    public Ship(TextureRegion region, int rows, int cols, int frames, Sound sound,Rect worldBounds) {
         super(region, rows, cols, frames);
         this.shootSound = sound;
     }
@@ -61,7 +61,7 @@ public class Ship extends Sprite {
     public void update(float delta) {
         super.update(delta);
         damageAnimateTimer += delta;
-        if (damageAnimateTimer >= DAMAGE_ANIMATE_INTERVAL) {
+              if (damageAnimateTimer >= DAMAGE_ANIMATE_INTERVAL) {
             frame = 0;
         }
     }
@@ -72,18 +72,23 @@ public class Ship extends Sprite {
         bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
         shootSound.play();
     }
+    protected void shoot(int damage, Vector2 bulletV ) {
+        Bullet bullet = bulletPool.obtain();
+        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight*2, worldBounds, bulletDamage*damage);
+        shootSound.play();
+    }
 
     public void boom() {
         Explosion explosion = explosionPool.obtain();
         explosion.set(getHeight()*(float)1.5, pos);
-
+        hp = 0;
 
     }
 
     public void damage(int damage) {
-       if(getClass().getSimpleName().equals("Healler"))
-       frame = 0;
-       else frame =1;
+
+       frame =1;
+        if(getClass().getSimpleName().equals("MainShip")) System.out.println("frame "+frame);
         damageAnimateTimer = 0f;
         hp -= damage;
         if (hp <= 0) {
@@ -93,6 +98,8 @@ public class Ship extends Sprite {
 
         }
     }
+
+
 
     public int getHp() {
         return hp;
@@ -104,6 +111,10 @@ public class Ship extends Sprite {
 
     public void setxPos(float xPos) {
         this.xPos = xPos; // охота на главный корабль
+    }
+
+    public float getPosYtail() {
+        return posYtail;
     }
 }
 

@@ -4,12 +4,12 @@ import com.badlogic.gdx.audio.Sound;
 
 import ru.geekbrains.stargame.base.SpritesPool;
 import ru.geekbrains.stargame.math.Rect;
-import ru.geekbrains.stargame.sprite.Enemy;
+import ru.geekbrains.stargame.sprite.Healler;
 import ru.geekbrains.stargame.sprite.MainShip;
-import ru.geekbrains.stargame.sprite.Star;
+import ru.geekbrains.stargame.sprite.Power;
 
 
-public class EnemyPool extends SpritesPool<Enemy> {
+public class PowerPool extends SpritesPool<Power> {
 
     private BulletPool bulletPool;
     private ExplosionPool explosionPool;
@@ -17,7 +17,7 @@ public class EnemyPool extends SpritesPool<Enemy> {
     private MainShip mainShip;
     private Sound sound;
 
-    public EnemyPool(BulletPool bulletPool, Rect worldBounds, ExplosionPool explosionPool, MainShip mainShip, Sound sound) {
+    public PowerPool(BulletPool bulletPool, Rect worldBounds, ExplosionPool explosionPool, MainShip mainShip, Sound sound) {
         this.bulletPool = bulletPool;
         this.worldBounds = worldBounds;
         this.explosionPool = explosionPool;
@@ -27,7 +27,7 @@ public class EnemyPool extends SpritesPool<Enemy> {
     }
 
     @Override
-    protected Enemy newObject() {
-        return new Enemy(bulletPool, worldBounds, explosionPool, mainShip, sound);
+    protected Power newObject() {
+        return new Power(bulletPool, worldBounds, explosionPool, mainShip, sound);
     }
 }

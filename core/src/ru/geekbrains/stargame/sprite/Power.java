@@ -10,22 +10,24 @@ import ru.geekbrains.stargame.pools.BulletPool;
 import ru.geekbrains.stargame.pools.ExplosionPool;
 
 
-public class Healler extends Ship {
+public class Power extends Ship {
 
     private enum State {DESCENT, FIGHT}
     private MainShip mainShip;
     private State state;
-    private int bonus;
+    private int bonusDamage;
+    private float bonusTime = 2f;
     private Vector2 v0 = new Vector2();
     private Vector2 descentV = new Vector2(0, -0.15f);
+    private Vector2 bonusV = new Vector2(0, 1.0f);
 
-    public Healler(BulletPool bulletPool, Rect worldBounds, ExplosionPool explosionPool, MainShip mainShip, Sound sound ) {
+    public Power(BulletPool bulletPool, Rect worldBounds, ExplosionPool explosionPool, MainShip mainShip, Sound sound ) {
         super(bulletPool, worldBounds, explosionPool, sound);
         this.v.set(v0);
         this.state = State.DESCENT;
         this.v.set(descentV);
         this.mainShip = mainShip;
-        this.bonus = 10;
+        this.bonusDamage = 5;
         regions = new TextureRegion[1];
     }
 
@@ -46,7 +48,7 @@ public class Healler extends Ship {
 
                 if (getBottom() < worldBounds.getBottom()) {
 
-                 bonus=0;
+                    bonusDamage=0;
                     boom();
                     destroy();
                 }
@@ -80,7 +82,9 @@ public class Healler extends Ship {
     @Override
     public void boom() {
         super.boom();
-        mainShip.setHp(mainShip.getHp()+bonus);
+
+        mainShip.setBonus(bonusV,bonusDamage,bonusTime);
+
 
     }
 }

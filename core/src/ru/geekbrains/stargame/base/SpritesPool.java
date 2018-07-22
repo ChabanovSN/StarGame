@@ -45,6 +45,10 @@ public abstract class SpritesPool<T extends Sprite> {
             }
         }
     }
+    public void freeAllActiveSprites() {
+        freeObjects.addAll(activeObjects);
+        activeObjects.clear();
+    }
 
     public void drawActiveSprites(SpriteBatch batch) {
         for (int i = 0; i < activeObjects.size(); i++) {
@@ -53,6 +57,7 @@ public abstract class SpritesPool<T extends Sprite> {
                 throw new RuntimeException("Draw destroyed sprite");
             }
             sprite.draw(batch);
+
         }
     }
 

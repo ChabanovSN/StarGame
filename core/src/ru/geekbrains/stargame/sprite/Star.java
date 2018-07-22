@@ -45,15 +45,11 @@ public class Star extends Sprite {
 
         if (!ship.isDestroyed()) {
             pos.x = ship.pos.x;
-            if (ship.getClass().getSimpleName().equals("MainShip")) {
-                pos.y = ship.getBottom();
-            } else {
-                pos.y = ship.getTop();
-            }
-
+            pos.y = ship.getPosYtail();
             scale = Rnd.nextFloat(0.5f, 1.5f);// эффект мерцания
         } else {
-            if (scale < 10f) scale += 0.5f;
+            if (scale < 20f) scale += 0.5f;
+
         }
 
     }

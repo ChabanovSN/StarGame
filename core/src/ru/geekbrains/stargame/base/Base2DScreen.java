@@ -29,7 +29,6 @@ public class Base2DScreen implements Screen, InputProcessor {
 
     private Vector2 touch = new Vector2();
 
-
     public Base2DScreen(Game game) {
         this.game = game;
         this.screenBounds = new Rect();
@@ -39,7 +38,6 @@ public class Base2DScreen implements Screen, InputProcessor {
         this.screenToWorld = new Matrix3();
         Gdx.input.setInputProcessor(this);
         batch = new SpriteBatch();
-
     }
 
     @Override
@@ -50,10 +48,6 @@ public class Base2DScreen implements Screen, InputProcessor {
     @Override
     public void render(float delta) {
 
-    }
-
-    public Rect getWorldBounds() {
-        return worldBounds;
     }
 
     @Override
@@ -72,7 +66,6 @@ public class Base2DScreen implements Screen, InputProcessor {
     }
 
     public void resize(Rect worldBounds) {
-
         System.out.println("resize w=" + worldBounds.getWidth() + " h=" + worldBounds.getHeight());
     }
 
@@ -159,6 +152,4 @@ public class Base2DScreen implements Screen, InputProcessor {
         System.out.println("scrolled amount=" + amount);
         return false;
     }
-
-
 }
