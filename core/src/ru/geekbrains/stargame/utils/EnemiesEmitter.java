@@ -133,7 +133,7 @@ public class EnemiesEmitter {
                         ENEMY_BIG_HP*stage
                 );
             }
-            if(mainShip.getHp()<30){
+            if(mainShip.getHp()<30 || Rnd.nextFloat(0.1f,1.0f)<=0.2f){
                 Healler healler = heallerPool.obtain();
                       healler.set(
                               heallerRegion,
