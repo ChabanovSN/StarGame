@@ -88,7 +88,7 @@ public class Ship extends Sprite {
     public void damage(int damage) {
 
        frame =1;
-        if(getClass().getSimpleName().equals("MainShip")) System.out.println("frame "+frame);
+
         damageAnimateTimer = 0f;
         hp -= damage;
         if (hp <= 0) {

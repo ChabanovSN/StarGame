@@ -11,6 +11,7 @@ public class Font extends BitmapFont {
 
     public Font(String fontFile, String imageFile) {
         super(Gdx.files.internal(fontFile), Gdx.files.internal(imageFile), false, false);
+        setColor(1,0.5f,0,1);
     }
 
     public void setWorldSize(float worldSize) {

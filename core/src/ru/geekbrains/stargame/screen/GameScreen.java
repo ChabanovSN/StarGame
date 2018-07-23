@@ -36,6 +36,7 @@ import ru.geekbrains.stargame.sprite.Power;
 import ru.geekbrains.stargame.sprite.RedHP;
 import ru.geekbrains.stargame.sprite.Star;
 import ru.geekbrains.stargame.utils.EnemiesEmitter;
+import ru.geekbrains.stargame.utils.ScoreManager;
 
 
 public class GameScreen extends Base2DScreen implements ActionListener {
@@ -78,13 +79,15 @@ public class GameScreen extends Base2DScreen implements ActionListener {
     private ButtonNewGame buttonNewGame;
     private RedHP redHP;
     private GreenHP greenHP;
-
+    private ScoreManager scoreManager;
+    private boolean checkMainShipDestroyed=false;
     private Font font;
 
     private int frags;
     private StringBuilder sbFrags = new StringBuilder();
     private StringBuilder sbHp = new StringBuilder();
     private StringBuilder sbStage = new StringBuilder();
+    private StringBuilder bestScore = new StringBuilder();
 
     public GameScreen(Game game) {
         super(game);
@@ -132,6 +135,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
         buttonNewGame = new ButtonNewGame(atlas[0], this);
         font = new Font("font/font.fnt", "font/font.png");
         font.setWorldSize(FONT_SIZE);
+        scoreManager = new ScoreManager();
         startNewGame();
     }
 
@@ -145,6 +149,12 @@ public class GameScreen extends Base2DScreen implements ActionListener {
         font.draw(batch, sbStage.append("Stage: ").append(enemiesEmitter.getStage()), worldBounds.getRight(), worldBounds.getTop(), Align.right);
         redHP.draw(batch);
         greenHP.draw(batch);
+
+    }
+    private void printBestScore() {
+        bestScore.setLength(0);
+        font. setColor(1,0.5f,0,1);
+        font.draw(batch, bestScore.append(scoreManager.getBestResult()), worldBounds.pos.x, messageGameOver.getTop()*2, Align.center);
 
     }
     @Override
@@ -176,13 +186,20 @@ public class GameScreen extends Base2DScreen implements ActionListener {
                 enemiesEmitter.generateEnemies(delta,frags);
                 if (mainShip.isDestroyed()) {
                     state = State.GAME_OVER;
+                   checkMainShipDestroyed=true;
                 }
+
                 break;
             case GAME_OVER:
                 bulletSound.dispose();
                 for (int i = 0; i < star.length; i++) {
                     star[i].update(mainShip);
                 }
+                if(checkMainShipDestroyed && mainShip.isDestroyed()){
+                    scoreManager.SaveScore(frags,enemiesEmitter.getStage());
+                    checkMainShipDestroyed=false;
+                }
+              //  scoreManager.LoadScore();
                 break;
 
 
@@ -214,11 +231,14 @@ public class GameScreen extends Base2DScreen implements ActionListener {
         if (state == State.GAME_OVER) {
             messageGameOver.draw(batch);
             buttonNewGame.draw(batch);
+            printBestScore();
         }
         printInfo();
         batch.end();
 
     }
+
+
 
     public void checkCollisions() {
         List<Enemy> enemyList = enemyPool.getActiveObjects();
@@ -234,6 +254,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
                 mainShip.boom();
                 mainShip.destroy();
                 state = State.GAME_OVER;
+                checkMainShipDestroyed=true;
                 return;
             }
         }
@@ -423,6 +444,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
 
         mainShip.setToNewGame();
         enemiesEmitter.setToNewGame();
+        checkMainShipDestroyed=false;
 
         bulletPool.freeAllActiveSprites();
         enemyPool.freeAllActiveSprites();

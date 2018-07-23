@@ -19,7 +19,7 @@ public class ScaledTouchUpButton extends Sprite {
 
     @Override
     public void touchDown(Vector2 touch, int pointer) {
-        System.out.println(" getClass"+getClass().getSimpleName());
+     //   System.out.println(" getClass"+getClass().getSimpleName());
        if (pressed || !isMe(touch)) {
            return;
        }
