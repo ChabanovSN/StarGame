@@ -153,7 +153,6 @@ public class GameScreen extends Base2DScreen implements ActionListener {
     }
     private void printBestScore() {
         bestScore.setLength(0);
-        font. setColor(1,0.5f,0,1);
         font.draw(batch, bestScore.append(scoreManager.getBestResult()), worldBounds.pos.x, messageGameOver.getTop()*2, Align.center);
 
     }
