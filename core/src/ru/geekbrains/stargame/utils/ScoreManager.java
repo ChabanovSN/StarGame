@@ -13,19 +13,7 @@ public class ScoreManager {
     private FileHandle f = Gdx.files.local("records/highscore.txt");
 
     public ScoreManager() {
-        try {
-            bestResult = f.readString();
-            if (bestResult != null && bestResult.length() > 16) {
-                this.frageOld = Integer.parseInt(bestResult.split("\\s")[1]);
-                this.stageOld = Integer.parseInt(bestResult.split("\\s")[3]);
-            } else {
-                this.stageOld = 0;
-                this.frageOld = 0;
-            }
-
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
+        checkScore();
 
     }
 
@@ -36,9 +24,13 @@ public class ScoreManager {
     }
 
     public void SaveScore(int frags, int stage) {
+        checkScore();
+
         try {
             if (stage >= stageOld) {
                 if (frags > frageOld) {
+                    stageOld=stage;
+                    frageOld =frags;
                     //значение false, то текущее содержимое файла будут перезаписано.
                     f.writeString("Frags: " + frags + " Stage: " + stage, false);
                 }
@@ -47,7 +39,21 @@ public class ScoreManager {
             e.printStackTrace();
         }
     }
+  private void checkScore(){
+      try {
+          bestResult = f.readString();
+          if (bestResult != null && bestResult.length() > 16) {
+              this.frageOld = Integer.parseInt(bestResult.split("\\s")[1]);
+              this.stageOld = Integer.parseInt(bestResult.split("\\s")[3]);
+          } else {
+              this.stageOld = 0;
+              this.frageOld = 0;
+          }
 
+      } catch (RuntimeException e) {
+          e.printStackTrace();
+      }
+  }
 
 
 }
