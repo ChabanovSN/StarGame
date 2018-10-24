@@ -3,13 +3,12 @@ package ru.geekbrains.stargame.sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.geekbrains.stargame.base.Ship;
 import ru.geekbrains.stargame.base.Sprite;
 import ru.geekbrains.stargame.math.Rect;
 import ru.geekbrains.stargame.math.Rnd;
 
-/**
- * Created by Alexey on 30.06.2018.
- */
+
 
 public class Star extends Sprite {
 
@@ -22,7 +21,11 @@ public class Star extends Sprite {
         v.set(vx, vy);
         setHeightProportion(height);
     }
+    public Star(TextureRegion region, float height) {
+        super(region);
 
+        setHeightProportion(height);
+    }
     @Override
     public void resize(Rect worldBounds) {
         this.worldBounds = worldBounds;
@@ -35,6 +38,20 @@ public class Star extends Sprite {
     public void update(float delta) {
         pos.mulAdd(v, delta);
         checkAndHandleBounds();
+        scale =Rnd.nextFloat(0.3f,1.5f); // эффект мерцания
+    }
+
+    public void update(Ship ship) {
+
+        if (!ship.isDestroyed()) {
+            pos.x = ship.pos.x;
+            pos.y = ship.getPosYtail();
+            scale = Rnd.nextFloat(0.5f, 1.5f);// эффект мерцания
+        } else {
+            if (scale < 20f) scale += 0.5f;
+
+        }
+
     }
 
     private void checkAndHandleBounds() {
